@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, sys, time
+import os, sys, time, re
 import humod
 from humod.at_commands import Command
 from serial.tools import list_ports
@@ -46,7 +46,7 @@ def getTime():
 
 def getGpsConf():
     gpsConf = Command(modem, '+CGPS')
-    return gpsConf.get()[0].encode('UTF8').split(',',1)
+    return gpsConf.get()[0].encode('UTF8').split(',', 1)
 
 
 def enableGps():
@@ -75,12 +75,19 @@ def disableGps():
     print('GPS disabled')
 
 
+def handleNewLoc(modem, message):
+    print(message)
+
 def main():
+    humod.actions.PATTERN['location'] = re.compile(r'^\$GPGGA.*')
+    print humod.actions.PATTERN.keys()
+    loc_action = (humod.actions.PATTERN['location'], handleNewLoc)
+    actions = [loc_action]
     print('apn: ', checkApn())
     print('starting prober...')
     enableGps()
     print('gps conf: ', getGpsConf())
-    modem.prober.start()
+    modem.prober.start(actions)
 
     while True:
         time.sleep(5)
