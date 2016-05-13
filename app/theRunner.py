@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, sys, time, re
+import os, sys, time, re, signal
 import humod
 from humod.at_commands import Command
 from serial.tools import list_ports
@@ -19,7 +19,7 @@ dataPort = modemPorts[3]
 gpsUpdateRate = 5  # number of seconds between Loc updates
 
 modem = humod.Modem(atPort, dataPort)
-
+print('modem detected')
 
 def enableAutoReporting():
     autoCmd = Command(modem, '+AUTOCSQ')
@@ -84,10 +84,15 @@ def handleRssi(modem, message):
     print(message)
 
 
+def signal_handler(signum, frame):
+    raise Exception("Timed out!")
+
+signal.signal(signal.SIGALRM, signal_handler)
+signal.alarm(10)   # Ten seconds
+
 def main():
     humod.actions.PATTERN['location'] = re.compile(r'^\$GPGGA.*')
     humod.actions.PATTERN['signal'] = re.compile(r'^\+CSQ:.*')
-    print(humod.actions.PATTERN.keys())
     loc_action = (humod.actions.PATTERN['location'], handleNewLoc)
     rssi_action = (humod.actions.PATTERN['signal'], handleRssi)
     actions = [loc_action, rssi_action]
@@ -96,8 +101,8 @@ def main():
         print('connecting...')
         modem.connect()
         print('connected.')
-    except Exception as e:
-        print(e)
+    except Exception, msg:
+    	print "Timed out!"
 
     print('apn: ', checkApn())
     enableAutoReporting()
