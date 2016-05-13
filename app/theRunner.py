@@ -21,6 +21,24 @@ gpsUpdateRate = 5  # number of seconds between Loc updates
 modem = humod.Modem(atPort, dataPort)
 print('modem detected')
 
+class Timeout():
+    """Timeout class using ALARM signal."""
+    class Timeout(Exception):
+        pass
+
+    def __init__(self, sec):
+        self.sec = sec
+
+    def __enter__(self):
+        signal.signal(signal.SIGALRM, self.raise_timeout)
+        signal.alarm(self.sec)
+
+    def __exit__(self, *args):
+        signal.alarm(0)    # disable alarm
+
+    def raise_timeout(self, *args):
+        raise Timeout.Timeout()
+
 def enableAutoReporting():
     autoCmd = Command(modem, '+AUTOCSQ')
     return autoCmd.set("1,0")
@@ -102,11 +120,12 @@ def main():
     actions = [loc_action, rssi_action]
 
     try:
-        print('connecting...')
-        modem.connect()
-        print('connected.')
-    except Exception, msg:
-        print "Timed out!"
+        with Timeout(10):
+            print('connecting...')
+            modem.connect()
+            print('connected.')
+    except Timeout.Timeout:
+        print "Couldn't connect, Timed out!"
 
     print('apn: ', checkApn())
     enableAutoReporting()
