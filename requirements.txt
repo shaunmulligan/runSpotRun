@@ -1,0 +1,2 @@
+pynmea2
+git+https://github.com/shaunmulligan/pyhumod.git
