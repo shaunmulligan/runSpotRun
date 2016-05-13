@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import os, sys, time, re, signal
+import traceback
+import logging
 import humod
 from humod.at_commands import Command
 from serial.tools import list_ports
@@ -42,7 +44,7 @@ class Timeout():
 def enableAutoReporting():
     autoCmd = Command(modem, '+AUTOCSQ')
     autoCmd.set("1,0")
-	print('GPS auto reporting enabled')
+    print('GPS auto reporting enabled')
 
 
 def checkApn():
@@ -127,12 +129,15 @@ def main():
             print('connected.')
     except Timeout.Timeout:
         print "Couldn't connect, Timed out!"
-		continue
 
-    print('apn: ', checkApn())
-    enableAutoReporting()
-    enableGps()
-    print('gps conf: ', getGpsConf())
+    try:
+        print('apn: ', checkApn())
+        enableAutoReporting()
+        enableGps()
+        print('gps conf: ', getGpsConf())
+    except Exception as e:
+        logging.error(traceback.format_exc())
+
     print('starting event prober...')
     modem.prober.start(actions)
 
