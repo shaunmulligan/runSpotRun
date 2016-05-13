@@ -1,0 +1,12 @@
+source: ./
+before: 'echo "hello...."'
+ignore:
+    - Dockerfile
+    - resin-sync.yml
+    - src/
+    - README.md
+    - .DS_Store
+    - .git
+    - .dockerignore
+    - .gitignore
+progress: true

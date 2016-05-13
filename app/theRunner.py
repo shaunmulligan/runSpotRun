@@ -54,13 +54,13 @@ def enableGps():
     gpsConf = Command(modem, '+CGPS')
     gpsNmeaCmd = Command(modem, '+CGPSINFOCFG')
     settingStr = "%s,1" % str(gpsUpdateRate)
-    print(settingStr)
+
     if getGpsConf()[0]:
         print('GPS is already running')
         gpsConf.set("0,2")
         time.sleep(0.2)
         gpsNmeaCmd.set(settingStr)
-        time.sleep(0.2)
+        time.sleep(1)
         gpsConf.set("1,2")
     else:
         gpsNmeaCmd.set(settingStr)
@@ -84,11 +84,15 @@ def handleRssi(modem, message):
     print(message)
 
 
-def signal_handler(signum, frame):
-    raise Exception("Timed out!")
+def cleanup(*args):
+    print 'cleaning up...'
+    modem.prober.stop()
+    modem.disconnect()
+    disableGps()
+    os._exit
 
-signal.signal(signal.SIGALRM, signal_handler)
-signal.alarm(10)   # Ten seconds
+signal.signal(signal.SIGINT, cleanup)
+signal.signal(signal.SIGTERM, cleanup)
 
 def main():
     humod.actions.PATTERN['location'] = re.compile(r'^\$GPGGA.*')
@@ -102,7 +106,7 @@ def main():
         modem.connect()
         print('connected.')
     except Exception, msg:
-    	print "Timed out!"
+        print "Timed out!"
 
     print('apn: ', checkApn())
     enableAutoReporting()
@@ -120,9 +124,15 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         modem.prober.stop()
+        modem.disconnect()
         disableGps()
         print 'Interrupted'
         try:
             sys.exit(0)
         except SystemExit:
             os._exit(0)
+    finally:
+        print("cleaning up")
+        modem.prober.stop()
+        modem.disconnect()
+        disableGps()
