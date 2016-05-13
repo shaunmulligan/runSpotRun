@@ -13,9 +13,6 @@ while len(modemPorts) == 0:
         modemPorts.append(port)
     time.sleep(5)
 
-print
-print modemPorts
-
 
 # Globals
 atPort = modemPorts[2]
@@ -23,6 +20,11 @@ dataPort = modemPorts[3]
 gpsUpdateRate = 5  # number of seconds between Loc updates
 
 modem = humod.Modem(atPort, dataPort)
+
+
+def enableAutoReporting():
+    autoCmd = Command(modem, '+AUTOCSQ')
+    return autoCmd.set("1,1")
 
 
 def checkApn():
@@ -62,9 +64,9 @@ def enableGps():
         time.sleep(0.2)
         gpsConf.set("1,2")
     else:
-        gpsNmeaCmd.set("20,1")
+        gpsNmeaCmd.set(settingStr)
         time.sleep(0.2)
-        gpsConf.set(settingStr)
+        gpsConf.set("1,2")
         print('GPS enabled')
 
 
@@ -78,15 +80,21 @@ def disableGps():
 def handleNewLoc(modem, message):
     print(message)
 
+
+def handleRssi(modem, message):
+    print(message)
+
+
 def main():
     humod.actions.PATTERN['location'] = re.compile(r'^\$GPGGA.*')
-    print humod.actions.PATTERN.keys()
     loc_action = (humod.actions.PATTERN['location'], handleNewLoc)
-    actions = [loc_action]
+    rssi_action = (humod.actions.PATTERN['rssi update'], handleRssi)
+    actions = [loc_action, rssi_action]
     print('apn: ', checkApn())
-    print('starting prober...')
+    enableAutoReporting()
     enableGps()
     print('gps conf: ', getGpsConf())
+    print('starting event prober...')
     modem.prober.start(actions)
 
     while True:
