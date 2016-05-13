@@ -91,6 +91,14 @@ def main():
     loc_action = (humod.actions.PATTERN['location'], handleNewLoc)
     rssi_action = (humod.actions.PATTERN['signal'], handleRssi)
     actions = [loc_action, rssi_action]
+
+    try:
+        print('connecting...')
+        modem.connect()
+        print('connected.')
+    except Exception as e:
+        print(e)
+
     print('apn: ', checkApn())
     enableAutoReporting()
     enableGps()
