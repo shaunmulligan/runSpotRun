@@ -41,7 +41,8 @@ class Timeout():
 
 def enableAutoReporting():
     autoCmd = Command(modem, '+AUTOCSQ')
-    return autoCmd.set("1,0")
+    autoCmd.set("1,0")
+	print('GPS auto reporting enabled')
 
 
 def checkApn():
@@ -76,7 +77,7 @@ def enableGps():
     if getGpsConf()[0]:
         print('GPS is already running')
         gpsConf.set("0,2")
-        time.sleep(0.2)
+        time.sleep(1)
         gpsNmeaCmd.set(settingStr)
         time.sleep(1)
         gpsConf.set("1,2")
@@ -126,6 +127,7 @@ def main():
             print('connected.')
     except Timeout.Timeout:
         print "Couldn't connect, Timed out!"
+		continue
 
     print('apn: ', checkApn())
     enableAutoReporting()
