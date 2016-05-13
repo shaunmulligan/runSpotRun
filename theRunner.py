@@ -11,7 +11,6 @@ while len(modemPorts) == 0:
     portList = list_ports.grep("USB")
     for port, desc, hwid in sorted(portList):
         modemPorts.append(port)
-    time.sleep(5)
 
 
 # Globals
@@ -24,7 +23,7 @@ modem = humod.Modem(atPort, dataPort)
 
 def enableAutoReporting():
     autoCmd = Command(modem, '+AUTOCSQ')
-    return autoCmd.set("1,1")
+    return autoCmd.set("1,0")
 
 
 def checkApn():
@@ -87,8 +86,10 @@ def handleRssi(modem, message):
 
 def main():
     humod.actions.PATTERN['location'] = re.compile(r'^\$GPGGA.*')
+    humod.actions.PATTERN['signal'] = re.compile(r'^\+CSQ:.*')
+    print(humod.actions.PATTERN.keys())
     loc_action = (humod.actions.PATTERN['location'], handleNewLoc)
-    rssi_action = (humod.actions.PATTERN['rssi update'], handleRssi)
+    rssi_action = (humod.actions.PATTERN['signal'], handleRssi)
     actions = [loc_action, rssi_action]
     print('apn: ', checkApn())
     enableAutoReporting()
