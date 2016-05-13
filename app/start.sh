@@ -9,4 +9,4 @@ else
     echo "Spotify Key already exists"
 fi
 
-python ./app/tracker.py
+python ./app/theRunner.py
