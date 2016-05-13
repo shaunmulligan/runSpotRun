@@ -19,6 +19,7 @@ while len(modemPorts) == 0:
 atPort = modemPorts[2]
 dataPort = modemPorts[3]
 gpsUpdateRate = 5  # number of seconds between Loc updates
+filename = "/data/nmea-log.txt"
 
 modem = humod.Modem(atPort, dataPort)
 print('modem detected')
@@ -99,6 +100,8 @@ def disableGps():
 
 def handleNewLoc(modem, message):
     print(message)
+    with open(filename, 'a') as f:
+        f.write(message)
 
 
 def handleRssi(modem, message):
@@ -136,7 +139,7 @@ def main():
         enableGps()
         print('gps conf: ', getGpsConf())
     except Exception as e:
-        logging.error(traceback.format_exc())
+        print(e)
 
     print('starting event prober...')
     modem.prober.start(actions)
