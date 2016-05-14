@@ -2,6 +2,8 @@
 import os, sys, time, re, signal
 import traceback
 import logging
+import subprocess
+
 import humod
 from humod.at_commands import Command
 from serial.tools import list_ports
@@ -112,6 +114,7 @@ def cleanup(*args):
     print 'cleaning up...'
     modem.prober.stop()
     modem.disconnect()
+    subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
     disableGps()
     os._exit
 
@@ -130,6 +133,7 @@ def main():
             print('connecting...')
             modem.connect()
             print('connected.')
+            subprocess.Popen("route add -net 0.0.0.0/0 ppp0")
     except Timeout.Timeout:
         print "Couldn't connect, Timed out!"
 
@@ -154,6 +158,7 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         modem.prober.stop()
         modem.disconnect()
+        subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
         disableGps()
         print 'Interrupted'
         try:
@@ -164,4 +169,5 @@ if __name__ == '__main__':
         print("cleaning up")
         modem.prober.stop()
         modem.disconnect()
+        subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
         disableGps()
