@@ -5,6 +5,7 @@ import subprocess, uuid
 import humod
 from humod.at_commands import Command
 from serial.tools import list_ports
+from spotifyPlayer import SpotifyPlayer
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 # GPIO 23, 24 & 17 set up as inputs, pulled up to avoid false detection.
@@ -31,8 +32,11 @@ atPort = modemPorts[2]
 dataPort = modemPorts[3]
 gpsUpdateRate = 5  # number of seconds between Loc updates
 logGps = False # Boolean value to determine if we log GPS to file or not
-
 filename = "/data/place-holder-name.nmea"
+username = os.environ['USERNAME']
+password = os.environ['PASS']
+spotifyUri = 'spotify:user:fiat500c:playlist:54k50VZdvtnIPt4d8RBCmZ'
+player = None
 
 print "GPS data will be logged to: " + filename
 
@@ -142,23 +146,32 @@ signal.signal(signal.SIGTERM, cleanup)
 def handleStartStopButton(channel):
     global logGps
     global filename
+    global player
     if logGps:
         print "======== Stopping Tracking ========"
         logGps = False
+        player.play_track_from_current_playlist(17)
     else:
         print "======== Starting a run ========"
         logGps = True
         uniqFileId = str(uuid.uuid4())
         filename = "/data/" + uniqFileId + ".nmea"
+        player.do_pause()
 
 def handleSkipButton(channel):
     print "skipping to next song"
+    global player
+    player.play_next_track()
 
 GPIO.add_event_detect(17, GPIO.FALLING, callback=handleStartStopButton, bouncetime=300)
 
 GPIO.add_event_detect(23, GPIO.FALLING, callback=handleSkipButton, bouncetime=300)
 
 def main():
+    global spotifyUri
+    global username
+    global password
+    global player
     humod.actions.PATTERN['location'] = re.compile(r'^\$GPGGA.*')
     humod.actions.PATTERN['signal'] = re.compile(r'^\+CSQ:.*')
     loc_action = (humod.actions.PATTERN['location'], handleNewLoc)
@@ -174,6 +187,15 @@ def main():
             # subprocess.Popen("route add -net 0.0.0.0/0 ppp0")
     except Timeout.Timeout:
         print "Couldn't connect, Timed out!"
+
+    try:
+        with Timeout(10):
+            print('Logging into Spotify')
+            player = SpotifyPlayer()
+            player.do_login(username,password)
+            player.playlist = player.get_playlist_from_uri(spotifyUri)
+    except Timeout.Timeout:
+        print "Couldn't login to spotify, Timed out!"
 
     try:
         with Timeout(40):
