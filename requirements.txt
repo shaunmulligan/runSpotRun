@@ -1,2 +1,3 @@
 pynmea2
 git+https://github.com/shaunmulligan/pyhumod.git
+RPi.GPIO==0.6.2
