@@ -14,7 +14,7 @@ while True:
     for port, desc, hwid in sorted(portList):
         modemPorts.append(port)
     if len(modemPorts) > 0:
-        print('modem found!')
+        print('modem detected')
         break
     time.sleep(10)
 
@@ -25,10 +25,9 @@ gpsUpdateRate = 5  # number of seconds between Loc updates
 uniqFileId = str(uuid.uuid4())
 filename = "/data/" + uniqFileId + ".nmea"
 
-print("GPS data will be logged to: ",filename)
+print "GPS data will be logged to: " + filename
 
 modem = humod.Modem(atPort, dataPort)
-print('modem detected')
 
 class Timeout():
     """Timeout class using ALARM signal."""

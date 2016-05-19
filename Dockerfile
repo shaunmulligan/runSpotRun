@@ -5,7 +5,7 @@ RUN wget -q -O - https://apt.mopidy.com/mopidy.gpg | sudo apt-key add -
 RUN sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/jessie.list
 
 RUN apt-get update && apt-get install -yq \
-   libasound2-dev libspotify-dev python-serial ppp && \
+   libasound2-dev libspotify-dev python-serial ppp python-rpi.gpio && \
    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # create src dir
