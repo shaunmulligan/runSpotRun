@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os, sys, time, re, signal
-import subprocess, uuid
+import subprocess, uuid, logging
 
 import humod
 from humod.at_commands import Command
@@ -33,8 +33,8 @@ dataPort = modemPorts[3]
 gpsUpdateRate = 5  # number of seconds between Loc updates
 logGps = False # Boolean value to determine if we log GPS to file or not
 filename = "/data/place-holder-name.nmea"
-username = os.environ['USERNAME']
-password = os.environ['PASS']
+username = os.environ['SPOT_USER']
+password = os.environ['SPOT_PASS']
 spotifyUri = 'spotify:user:fiat500c:playlist:54k50VZdvtnIPt4d8RBCmZ'
 player = None
 
@@ -168,6 +168,7 @@ GPIO.add_event_detect(17, GPIO.FALLING, callback=handleStartStopButton, bounceti
 GPIO.add_event_detect(23, GPIO.FALLING, callback=handleSkipButton, bouncetime=300)
 
 def main():
+    logging.basicConfig(level=logging.INFO)
     global spotifyUri
     global username
     global password
@@ -194,8 +195,11 @@ def main():
             player = SpotifyPlayer()
             player.do_login(username,password)
             player.playlist = player.get_playlist_from_uri(spotifyUri)
+            print('Logged into Spotify')
     except Timeout.Timeout:
         print "Couldn't login to spotify, Timed out!"
+    except Exception as e:
+        print(e)
 
     try:
         with Timeout(40):
@@ -208,8 +212,11 @@ def main():
     except Exception as e:
         print(e)
 
-    print('starting event prober...')
-    modem.prober.start(actions)
+    try:
+        print('starting event prober...')
+        modem.prober.start(actions)
+    except Exception as e:
+        print(e)
 
     while True:
         time.sleep(5)
