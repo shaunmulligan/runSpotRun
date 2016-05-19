@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import os, sys, time, re, signal
-import traceback
-import logging
 import subprocess
 
 import humod
@@ -133,15 +131,18 @@ def main():
             print('connecting...')
             modem.connect()
             print('connected.')
-            subprocess.Popen("route add -net 0.0.0.0/0 ppp0")
+            # subprocess.Popen("route add -net 0.0.0.0/0 ppp0")
     except Timeout.Timeout:
         print "Couldn't connect, Timed out!"
 
     try:
-        print('apn: ', checkApn())
-        enableAutoReporting()
-        enableGps()
-        print('gps conf: ', getGpsConf())
+        with Timeout(10):
+            print('apn: ', checkApn())
+            enableAutoReporting()
+            enableGps()
+            print('gps conf: ', getGpsConf())
+    except Timeout.Timeout:
+        print "Couldn't connect, Timed out!"
     except Exception as e:
         print(e)
 
@@ -158,7 +159,7 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         modem.prober.stop()
         modem.disconnect()
-        subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
+        # subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
         disableGps()
         print 'Interrupted'
         try:
