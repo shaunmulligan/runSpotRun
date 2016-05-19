@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os, sys, time, re, signal
-import subprocess
+import subprocess, uuid
 
 import humod
 from humod.at_commands import Command
@@ -8,18 +8,23 @@ from serial.tools import list_ports
 
 modemPorts = []
 
-while len(modemPorts) == 0:
+while True:
     print('searching for modem')
     portList = list_ports.grep("USB")
     for port, desc, hwid in sorted(portList):
         modemPorts.append(port)
-
+    if len(modemPorts) == 0:
+        break
+    time.sleep(10)
 
 # Globals
 atPort = modemPorts[2]
 dataPort = modemPorts[3]
 gpsUpdateRate = 5  # number of seconds between Loc updates
-filename = "/data/nmea-log.txt"
+uniqFileId = str(uuid.uuid4())
+filename = "/data/" + uniqFileId + ".nmea"
+
+print("GPS data will be logged to: ",filename)
 
 modem = humod.Modem(atPort, dataPort)
 print('modem detected')
@@ -131,12 +136,13 @@ def main():
             print('connecting...')
             modem.connect()
             print('connected.')
+            # Start routing internet through modem
             # subprocess.Popen("route add -net 0.0.0.0/0 ppp0")
     except Timeout.Timeout:
         print "Couldn't connect, Timed out!"
 
     try:
-        with Timeout(10):
+        with Timeout(40):
             print('apn: ', checkApn())
             enableAutoReporting()
             enableGps()
