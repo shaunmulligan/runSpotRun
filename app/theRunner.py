@@ -13,7 +13,8 @@ while True:
     portList = list_ports.grep("USB")
     for port, desc, hwid in sorted(portList):
         modemPorts.append(port)
-    if len(modemPorts) == 0:
+    if len(modemPorts) > 0:
+        print('modem found!')
         break
     time.sleep(10)
 
