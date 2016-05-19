@@ -5,6 +5,14 @@ import subprocess, uuid
 import humod
 from humod.at_commands import Command
 from serial.tools import list_ports
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
+# GPIO 23, 24 & 17 set up as inputs, pulled up to avoid false detection.
+# Both ports are wired to connect to GND on button press.
+# So we'll be setting up falling edge detection for both
+GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 modemPorts = []
 
@@ -22,8 +30,9 @@ while True:
 atPort = modemPorts[2]
 dataPort = modemPorts[3]
 gpsUpdateRate = 5  # number of seconds between Loc updates
-uniqFileId = str(uuid.uuid4())
-filename = "/data/" + uniqFileId + ".nmea"
+logGps = False # Boolean value to determine if we log GPS to file or not
+
+filename = "/data/place-holder-name.nmea"
 
 print "GPS data will be logged to: " + filename
 
@@ -104,13 +113,18 @@ def disableGps():
 
 
 def handleNewLoc(modem, message):
-    print(message)
-    with open(filename, 'a') as f:
-        f.write(message)
+    global logGps
+    global filename
+    if logGps:
+        print(message)
+        with open(filename, 'a') as f:
+            f.write(message)
 
 
 def handleRssi(modem, message):
-    print(message)
+    global logGps
+    if logGps:
+        print(message)
 
 
 def cleanup(*args):
@@ -119,10 +133,30 @@ def cleanup(*args):
     modem.disconnect()
     subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
     disableGps()
+    GPIO.cleanup()           # clean up GPIO on normal exit
     os._exit
 
 signal.signal(signal.SIGINT, cleanup)
 signal.signal(signal.SIGTERM, cleanup)
+
+def handleStartStopButton(channel):
+    global logGps
+    global filename
+    if logGps:
+        print "======== Stopping Tracking ========"
+        logGps = False
+    else:
+        print "======== Starting a run ========"
+        logGps = True
+        uniqFileId = str(uuid.uuid4())
+        filename = "/data/" + uniqFileId + ".nmea"
+
+def handleSkipButton(channel):
+    print "skipping to next song"
+
+GPIO.add_event_detect(17, GPIO.FALLING, callback=handleStartStopButton, bouncetime=300)
+
+GPIO.add_event_detect(23, GPIO.FALLING, callback=handleSkipButton, bouncetime=300)
 
 def main():
     humod.actions.PATTERN['location'] = re.compile(r'^\$GPGGA.*')
