@@ -29,11 +29,13 @@ class SpotifyPlayer:
         self.logged_in = threading.Event()
         self.logged_out = threading.Event()
         self.logged_out.set()
+        self.config = spotify.Config()
+        self.config.cache_location = '/data'
+        self.config.application_key = '/data/spotify_appkey.key'
 
-        self.session = spotify.Session()
+        self.session = spotify.Session(config=self.config)
         self.session.on(spotify.SessionEvent.CONNECTION_STATE_UPDATED,self.on_connection_state_changed)
         self.session.on(spotify.SessionEvent.END_OF_TRACK, self.on_end_of_track)
-        self.session.load_application_key_file(filename='/data/spotify_appkey.key')
 
         try:
             self.audio_driver = spotify.AlsaSink(self.session)
@@ -64,7 +66,6 @@ class SpotifyPlayer:
         #self.session.player.play(False)
 
     def do_login(self, username, password):
-        print self.session.application_key
         self.session.login(username, password, remember_me=True)
         self.logged_in.wait()
 
