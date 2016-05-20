@@ -144,10 +144,14 @@ def handleRssi(modem, message):
 
 def cleanup(*args):
     print 'cleaning up...'
+    print 'Stopping Prober'
     modem.prober.stop()
-    modem.disconnect()
+    print 'Stopping Modem'
     # subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
+    modem.disconnect()
+    print 'Stopping GPS'
     disableGps()
+    print 'Cleaning up GPIO'
     GPIO.cleanup()           # clean up GPIO on normal exit
     os._exit
 
@@ -252,8 +256,4 @@ if __name__ == '__main__':
         print 'Interrupted'
         sys.exit(0)
     finally:
-        print("cleaning up")
-        modem.prober.stop()
-        modem.disconnect()
-        #subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
-        disableGps()
+        print("All cleaned up")
