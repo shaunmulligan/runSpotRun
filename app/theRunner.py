@@ -60,6 +60,15 @@ class Timeout():
     def raise_timeout(self, *args):
         raise Timeout.Timeout()
 
+try:
+    with Timeout(10):
+        print('Creating Global Spotify object')
+        player = SpotifyPlayer()
+except Timeout.Timeout:
+    print "Couldn't create spotify, Timed out!"
+except Exception as e:
+    print(e)
+
 def enableAutoReporting():
     autoCmd = Command(modem, '+AUTOCSQ')
     autoCmd.set("1,0")
@@ -191,11 +200,19 @@ def main():
 
     try:
         with Timeout(10):
-            print('Logging into Spotify')
-            player = SpotifyPlayer()
+            print('logging into spotify')
+            print(username)
+            print(password)
             player.do_login(username,password)
+    except Timeout.Timeout:
+        print "Couldn't login to spotify, Timed out!"
+    except Exception as e:
+        print(e)
+
+    try:
+        with Timeout(10):
+            print('Start spotify playlist')
             player.playlist = player.get_playlist_from_uri(spotifyUri)
-            print('Logged into Spotify')
     except Timeout.Timeout:
         print "Couldn't login to spotify, Timed out!"
     except Exception as e:

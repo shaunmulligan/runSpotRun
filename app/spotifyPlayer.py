@@ -31,7 +31,7 @@ class SpotifyPlayer:
         self.logged_out.set()
         self.config = spotify.Config()
         self.config.cache_location = '/data'
-        self.config.application_key = '/data/spotify_appkey.key'
+        # self.config.application_key = '/data/spotify_appkey.key'
 
         self.session = spotify.Session(config=self.config)
         self.session.on(spotify.SessionEvent.CONNECTION_STATE_UPDATED,self.on_connection_state_changed)

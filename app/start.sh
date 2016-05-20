@@ -9,5 +9,5 @@ if [ ! -e "key" ]; then
 else
     echo "Spotify Key already exists"
 fi
-
+cp /data/spotify_appkey.key ./spotify_appkey.key
 python ./app/theRunner.py
