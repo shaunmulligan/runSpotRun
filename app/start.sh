@@ -13,9 +13,9 @@ fi
 # remove all old run logs
 if [ -e "/data/runLog.nmea" ]; then
   echo "Removing old running logs..."
-  rm runLog.nmea
-  rm runUpload.gpx
+  rm /data/runLog.nmea
+  rm /data/runUpload.gpx
 fi
 
 cp /data/spotify_appkey.key ./spotify_appkey.key
-python ./app/theRunner.py
+exec /usr/src/app/app/theRunner.py
