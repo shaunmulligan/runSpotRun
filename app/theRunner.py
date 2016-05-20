@@ -8,6 +8,7 @@ from humod.at_commands import Command
 from serial.tools import list_ports
 from spotifyPlayer import SpotifyPlayer
 from nmeaConverter import Converter
+from volumeController import VolumeController
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 # GPIO 23, 24 & 17 set up as inputs, pulled up to avoid false detection.
@@ -70,6 +71,7 @@ except Timeout.Timeout:
     print "Couldn't create spotify, Timed out!"
 except Exception as e:
     print(e)
+audio = VolumeController()
 
 def enableAutoReporting():
     autoCmd = Command(modem, '+AUTOCSQ')
@@ -169,24 +171,34 @@ def handleStartStopButton(channel):
     global logGps
     global filename
     global player
-    if logGps:
-        print "======== Stopping Tracking ========"
-        logGps = False
-        player.do_pause()
-        nmeaFile = Converter()
-        nmeaFile.convert(filename,"/data/runUpload.gpx")
+    global audio
+    if (GPIO.input(24) == GPIO.LOW):
+        print 'Increase Volume'
+        audio.volume_up()
     else:
-        print "======== Starting a run ========"
-        logGps = True
+        if logGps:
+            print "======== Stopping Tracking ========"
+            logGps = False
+            player.do_pause()
+            nmeaFile = Converter()
+            nmeaFile.convert(filename,"/data/runUpload.gpx")
+        else:
+            print "======== Starting a run ========"
+            logGps = True
 
-        # player.play_track_from_current_playlist(17)
-        player.do_resume()
+            # player.play_track_from_current_playlist(17)
+            player.do_resume()
 
 
 def handleSkipButton(channel):
-    print "skipping to next song"
-    global player
-    player.play_next_track()
+    global audio
+    if (GPIO.input(24) == GPIO.LOW):
+        print 'Decrease Volume'
+        audio.volume_down()
+    else:
+        print "skipping to next song"
+        global player
+        player.play_next_track()
 
 GPIO.add_event_detect(17, GPIO.FALLING, callback=handleStartStopButton, bouncetime=300)
 
@@ -198,11 +210,14 @@ def main():
     global username
     global password
     global player
+    global audio
     humod.actions.PATTERN['location'] = re.compile(r'^\$GPGGA.*')
     humod.actions.PATTERN['signal'] = re.compile(r'^\+CSQ:.*')
     loc_action = (humod.actions.PATTERN['location'], handleNewLoc)
     rssi_action = (humod.actions.PATTERN['signal'], handleRssi)
     actions = [loc_action, rssi_action]
+
+    audio.set_volume(50)
 
     try:
         with Timeout(10):

@@ -9,7 +9,7 @@ class VolumeController(object):
 
     def __init__(self):
         super(VolumeController, self).__init__()
-        self.mixer = alsaaudio.Mixer()
+        self.mixer = alsaaudio.Mixer("PCM")
         self.current_volume = self.get_volume()
 
     def get_volume(self):
