@@ -16,3 +16,7 @@ To get your spotify_appkey.key file on to your device we will use resin environm
 Now take that output sting and add an Env Var on the resin.io Dashboard called `APP_KEY`
 
 You will also need two other Env Vars, namely `SPOT_USER` and `SPOT_PASS` which are obviously your user login credentials for spotify.
+
+#### Add audio Device Tree
+To enable the pHat DAC on your device you need to add the following line to your config.txt:
+`dtoverlay=hifiberry-dac`
