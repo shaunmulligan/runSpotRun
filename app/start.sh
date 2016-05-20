@@ -9,5 +9,13 @@ if [ ! -e "key" ]; then
 else
     echo "Spotify Key already exists"
 fi
+
+# remove all old run logs
+if [ -e "/data/runLog.nmea" ]; then
+  echo "Removing old running logs..."
+  rm runLog.nmea
+  rm runUpload.gpx
+fi
+
 cp /data/spotify_appkey.key ./spotify_appkey.key
 python ./app/theRunner.py

@@ -33,7 +33,7 @@ atPort = modemPorts[2]
 dataPort = modemPorts[3]
 gpsUpdateRate = 5  # number of seconds between Loc updates
 logGps = False # Boolean value to determine if we log GPS to file or not
-filename = "/data/place-holder-name.nmea"
+filename = "/data/runLog.nmea"
 username = os.environ['SPOT_USER']
 password = os.environ['SPOT_PASS']
 spotifyUri = 'spotify:user:fiat500c:playlist:54k50VZdvtnIPt4d8RBCmZ'
@@ -145,12 +145,12 @@ def cleanup(*args):
     print 'cleaning up...'
     modem.prober.stop()
     modem.disconnect()
-    subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
+    # subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
     disableGps()
     GPIO.cleanup()           # clean up GPIO on normal exit
     os._exit
 
-signal.signal(signal.SIGINT, cleanup)
+# signal.signal(signal.SIGINT, cleanup)
 signal.signal(signal.SIGTERM, cleanup)
 
 def handleStartStopButton(channel):
@@ -166,8 +166,7 @@ def handleStartStopButton(channel):
     else:
         print "======== Starting a run ========"
         logGps = True
-        uniqFileId = str(uuid.uuid4())
-        filename = "/data/" + uniqFileId + ".nmea"
+
         # player.play_track_from_current_playlist(17)
         player.do_resume()
 
@@ -249,15 +248,8 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        modem.prober.stop()
-        modem.disconnect()
-        # subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
-        disableGps()
         print 'Interrupted'
-        try:
-            sys.exit(0)
-        except SystemExit:
-            os._exit(0)
+        sys.exit(0)
     finally:
         print("cleaning up")
         modem.prober.stop()
