@@ -165,7 +165,8 @@ def handleStartStopButton(channel):
         logGps = True
         uniqFileId = str(uuid.uuid4())
         filename = "/data/" + uniqFileId + ".nmea"
-        player.play_track_from_current_playlist(17)
+        # player.play_track_from_current_playlist(17)
+        player.do_resume()
 
 
 def handleSkipButton(channel):
@@ -202,8 +203,6 @@ def main():
     try:
         with Timeout(10):
             print('logging into spotify')
-            print(username)
-            print(password)
             player.do_login(username,password)
     except Timeout.Timeout:
         print "Couldn't login to spotify, Timed out!"
@@ -214,6 +213,8 @@ def main():
         with Timeout(10):
             print('Start spotify playlist')
             player.playlist = player.get_playlist_from_uri(spotifyUri)
+            player.play_track_from_current_playlist(3)
+            player.do_pause()
     except Timeout.Timeout:
         print "Couldn't login to spotify, Timed out!"
     except Exception as e:
@@ -236,6 +237,7 @@ def main():
     except Exception as e:
         print(e)
 
+    print('======== Ready to Run!!! ========')
     while True:
         time.sleep(5)
 
@@ -257,5 +259,5 @@ if __name__ == '__main__':
         print("cleaning up")
         modem.prober.stop()
         modem.disconnect()
-        subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
+        #subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
         disableGps()
