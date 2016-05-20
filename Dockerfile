@@ -20,8 +20,12 @@ COPY ./requirements.txt /requirements.txt
 # pip install python deps from requirements.txt on the resin.io build server
 RUN pip install -r /requirements.txt
 
+COPY entry.sh /usr/bin/entry.sh
+
 # Copy all of files here for caching purposes
 COPY . ./
+
+ENV INITSYSTEM=off
 
 # runs the start script on container start
 CMD ["./app/start.sh"]
