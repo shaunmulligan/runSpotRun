@@ -23,5 +23,8 @@ RUN pip install -r /requirements.txt
 # Copy all of files here for caching purposes
 COPY . ./
 
+ENV INITSYSTEM=on
+STOPSIGNAL 37
+
 # runs the start script on container start
 CMD ["./app/start.sh"]
