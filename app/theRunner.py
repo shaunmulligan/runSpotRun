@@ -159,13 +159,14 @@ def handleStartStopButton(channel):
     if logGps:
         print "======== Stopping Tracking ========"
         logGps = False
-        player.play_track_from_current_playlist(17)
+        player.do_pause()
     else:
         print "======== Starting a run ========"
         logGps = True
         uniqFileId = str(uuid.uuid4())
         filename = "/data/" + uniqFileId + ".nmea"
-        player.do_pause()
+        player.play_track_from_current_playlist(17)
+
 
 def handleSkipButton(channel):
     print "skipping to next song"
