@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -yq \
 
 # create src dir
 RUN mkdir -p /usr/src/app/
-
+COPY asound.conf /etc/asound.conf
 # set as WORKDIR
 WORKDIR /usr/src/app
 

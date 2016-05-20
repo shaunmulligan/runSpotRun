@@ -1,5 +1,11 @@
 #!/bin/sh
 
+modprobe i2c-bcm2708
+modprobe snd-soc-pcm512x
+modprobe snd-soc-wm8804
+
+rmmod snd_bcm2835
+
 # Get the spotify api key
 key=/data/spotify_appkey.key
 if [ ! -e "key" ]; then
