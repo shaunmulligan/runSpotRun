@@ -6,6 +6,7 @@ import humod
 from humod.at_commands import Command
 from serial.tools import list_ports
 from spotifyPlayer import SpotifyPlayer
+from nmeaConverter import Converter
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 # GPIO 23, 24 & 17 set up as inputs, pulled up to avoid false detection.
@@ -160,6 +161,8 @@ def handleStartStopButton(channel):
         print "======== Stopping Tracking ========"
         logGps = False
         player.do_pause()
+        nmeaFile = Converter()
+        nmeaFile.convert(filename,"/data/runUpload.gpx")
     else:
         print "======== Starting a run ========"
         logGps = True
