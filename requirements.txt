@@ -1,4 +1,4 @@
-git+https://github.com/shaunmulligan/pyhumod.git
+git+https://github.com/shaunmulligan/pyhumod.git@reopen-modem
 RPi.GPIO==0.6.2
 pyspotify==2.0.5
 pyalsaaudio==0.8.2
