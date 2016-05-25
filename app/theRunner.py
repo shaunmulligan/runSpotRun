@@ -148,7 +148,7 @@ def cleanup(*args):
 
 
     try:
-        # subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
+        subprocess.Popen("route delete -net 0.0.0.0/0 ppp0")
         print 'Stopping Modem'
         modem.disconnect()
     except Exception as e:
@@ -225,7 +225,7 @@ def main():
             modem.connect()
             print('connected.')
             # Start routing internet through modem
-            # subprocess.Popen("route add -net 0.0.0.0/0 ppp0")
+            subprocess.Popen("route add -net 0.0.0.0/0 ppp0")
     except Timeout.Timeout:
         print "Couldn't connect, Timed out!"
 
