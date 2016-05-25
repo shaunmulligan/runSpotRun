@@ -8,7 +8,7 @@ from humod.at_commands import Command
 from serial.tools import list_ports
 from spotifyPlayer import SpotifyPlayer
 from nmeaConverter import Converter
-from volumeController import VolumeController
+# from volumeController import VolumeController
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 # GPIO 23, 24 & 25 set up as inputs, pulled up to avoid false detection.
@@ -74,7 +74,7 @@ except Timeout.Timeout:
     print "Couldn't create spotify, Timed out!"
 except Exception as e:
     print(e)
-audio = VolumeController()
+# audio = VolumeController()
 
 def enableAutoReporting():
     autoCmd = Command(modem, '+AUTOCSQ')
@@ -174,10 +174,10 @@ def handleStartStopButton(channel):
     global logGps
     global filename
     global player
-    global audio
+    # global audio
     if (GPIO.input(MODE_BTN) == GPIO.LOW):
         print 'Increase Volume'
-        audio.volume_up()
+        # audio.volume_up()
     else:
         if logGps:
             print "======== Stopping Tracking ========"
@@ -194,10 +194,10 @@ def handleStartStopButton(channel):
 
 
 def handleSkipButton(channel):
-    global audio
+    # global audio
     if (GPIO.input(MODE_BTN) == GPIO.LOW):
         print 'Decrease Volume'
-        audio.volume_down()
+        # audio.volume_down()
     else:
         print "skipping to next song"
         global player
@@ -213,14 +213,14 @@ def main():
     global username
     global password
     global player
-    global audio
+    # global audio
     humod.actions.PATTERN['location'] = re.compile(r'^\$GPGGA.*')
     humod.actions.PATTERN['signal'] = re.compile(r'^\+CSQ:.*')
     loc_action = (humod.actions.PATTERN['location'], handleNewLoc)
     rssi_action = (humod.actions.PATTERN['signal'], handleRssi)
     actions = [loc_action, rssi_action]
 
-    audio.set_volume(50)
+    # audio.set_volume(50)
 
     try:
         with Timeout(10):
