@@ -11,12 +11,15 @@ from nmeaConverter import Converter
 from volumeController import VolumeController
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
-# GPIO 23, 24 & 17 set up as inputs, pulled up to avoid false detection.
-# Both ports are wired to connect to GND on button press.
+# GPIO 23, 24 & 25 set up as inputs, pulled up to avoid false detection.
+# ports are wired to connect to GND on button press.
 # So we'll be setting up falling edge detection for both
-GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(17, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+STOP_START_BTN = 25
+SKIP_BTN = 24
+MODE_BTN = 23
+GPIO.setup(MODE_BTN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(STOP_START_BTN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(SKIP_BTN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 modemPorts = []
 
@@ -172,7 +175,7 @@ def handleStartStopButton(channel):
     global filename
     global player
     global audio
-    if (GPIO.input(24) == GPIO.LOW):
+    if (GPIO.input(MODE_BTN) == GPIO.LOW):
         print 'Increase Volume'
         audio.volume_up()
     else:
@@ -192,7 +195,7 @@ def handleStartStopButton(channel):
 
 def handleSkipButton(channel):
     global audio
-    if (GPIO.input(24) == GPIO.LOW):
+    if (GPIO.input(MODE_BTN) == GPIO.LOW):
         print 'Decrease Volume'
         audio.volume_down()
     else:
@@ -200,9 +203,9 @@ def handleSkipButton(channel):
         global player
         player.play_next_track()
 
-GPIO.add_event_detect(17, GPIO.FALLING, callback=handleStartStopButton, bouncetime=300)
+GPIO.add_event_detect(STOP_START_BTN, GPIO.FALLING, callback=handleStartStopButton, bouncetime=300)
 
-GPIO.add_event_detect(23, GPIO.FALLING, callback=handleSkipButton, bouncetime=300)
+GPIO.add_event_detect(SKIP_BTN, GPIO.FALLING, callback=handleSkipButton, bouncetime=300)
 
 def main():
     logging.basicConfig(level=logging.INFO)
