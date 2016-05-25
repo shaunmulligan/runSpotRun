@@ -165,8 +165,6 @@ def cleanup(*args):
     modem.prober.stop()
     print 'cleaning up...'
 
-
-
 # signal.signal(signal.SIGINT, cleanup)
 signal.signal(signal.SIGTERM, cleanup)
 
