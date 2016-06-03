@@ -13,7 +13,7 @@ commands.
 
 from __future__ import unicode_literals
 
-import logging
+import logging, os
 import threading
 import time
 
@@ -181,8 +181,10 @@ class SpotifyPlayer:
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
+    user = os.environ['SPOT_USER']
+    pwd = os.environ['SPOT_PASS']
     player = SpotifyPlayer()
-    player.do_login('your_user_name','your_password')
+    player.do_login(user,pwd)
     player.playlist = player.get_playlist_from_uri('spotify:user:fiat500c:playlist:54k50VZdvtnIPt4d8RBCmZ')
     player.play_track_from_current_playlist(6)
     time.sleep(10)

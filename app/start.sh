@@ -4,8 +4,6 @@ modprobe i2c-bcm2708
 modprobe snd-soc-pcm512x
 modprobe snd-soc-wm8804
 
-rmmod snd_bcm2835
-
 # Get the spotify api key
 key=/data/spotify_appkey.key
 if [ ! -e "key" ]; then
@@ -25,4 +23,5 @@ fi
 
 cp /data/spotify_appkey.key ./spotify_appkey.key
 # exec /usr/src/app/app/theRunner.py
+exec /usr/src/app/app/spotifyPlayer.py
 echo "starting..."

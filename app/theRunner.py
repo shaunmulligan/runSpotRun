@@ -229,6 +229,8 @@ def main():
             subprocess.Popen("route add -net 0.0.0.0/0 ppp0")
     except Timeout.Timeout:
         print "Couldn't connect, Timed out!"
+    except Exception as e:
+        print(e)
 
     try:
         with Timeout(10):
