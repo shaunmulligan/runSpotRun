@@ -22,6 +22,6 @@ if [ -e "/data/runLog.nmea" ]; then
 fi
 
 cp /data/spotify_appkey.key ./spotify_appkey.key
-# exec /usr/src/app/app/theRunner.py
-exec /usr/src/app/app/spotifyPlayer.py
+exec /usr/src/app/app/theRunner.py
+#exec /usr/src/app/app/spotifyPlayer.py
 echo "starting..."
